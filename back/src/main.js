@@ -21,6 +21,8 @@ app.use(cors());
     // 여기에 사용자 인증 로직을 추가하세요
   }
 ));*/
+
+
 app.post('/login', (req,res) => {
     const { username, password } = req.body;
     if (username === 'yu215' && password === 'yyj215') {res.status(200).json({message:'로그인 성공'});}
