@@ -2,6 +2,8 @@ const express = require('express');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+const cors = require('cors');
+
 
 const app = express();
 const PORT = 3001;
@@ -12,7 +14,7 @@ const db = mysql.createConnection({
   password: 'yyj215', // MySQL 계정 비밀번호
   database: 'studycaffe' // 위에서 생성한 데이터베이스명
 });
-
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
