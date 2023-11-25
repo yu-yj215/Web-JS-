@@ -16,9 +16,9 @@ const RegistrationForm = () => {
       }
 
       const response = await axios.post('http://localhost:3001/register', { username, password });
-      alert(response.data.message); // Registration success message from the server
+      alert(response.message); // Registration success message from the server
     } catch (error) {
-      console.error('Registration failed:', error.response.data.message); // Registration failure message from the server
+      console.error('Registration failed:', error.response.data.error); // Registration failure message from the server
     }
   };
 

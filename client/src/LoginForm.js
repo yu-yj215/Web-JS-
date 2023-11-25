@@ -9,9 +9,9 @@ const LoginForm = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://localhost:3001/login', { username, password });
-      alert(response.data); // 로그인 성공 시 서버에서 반환한 데이터
+      alert(response.data.message); // 로그인 성공 시 서버에서 반환한 데이터
     } catch (error) {
-      console.error('Login failed:', error.response.data.message); // 로그인 실패 시 서버에서 반환한 에러 메시지
+      console.error('Login failed:', error.response.data.error); // 로그인 실패 시 서버에서 반환한 에러 메시지
     }
   };
 
