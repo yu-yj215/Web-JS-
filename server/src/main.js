@@ -59,7 +59,9 @@ app.post('/login', async (req, res) => {
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (passwordMatch) {
+          console.log("로그인 요청, 승인")
           res.status(200).json({ message: 'Login successful' });
+          
         } else {
           res.status(401).json({ error: 'Invalid credentials' });
         }
