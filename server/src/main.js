@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
@@ -14,7 +15,22 @@ const db = mysql.createConnection({
   password: 'yyj215', // MySQL 계정 비밀번호
   database: 'studycaffe' // 위에서 생성한 데이터베이스명
 });
-app.use(cors());
+
+app.use(
+  session({
+    secret: '@mysecretkey',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 0.5 * 6 * 60 * 10000,
+    },
+  })
+);
+app.use(cors({
+  origin: 'http://localhost:3000', // 클라이언트의 주소
+  credentials: true, // 쿠키를 전송할 수 있도록 설정
+
+}));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -45,7 +61,6 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-
     // 사용자 조회
     db.query('SELECT * FROM users WHERE username = ?', [username], async (error, results) => {
       if (error) {
@@ -60,7 +75,9 @@ app.post('/login', async (req, res) => {
 
         if (passwordMatch) {
           console.log("로그인 요청, 승인")
-          res.status(200).json({ message: 'Login successful' });
+          req.session.user = { userid: username };
+          console.log('Session information:', req.session);
+          res.json({message:"로그인 성공"}); 
           
         } else {
           res.status(401).json({ error: 'Invalid credentials' });
@@ -72,6 +89,18 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+app.get('/check-login', (req, res) => {
+  if (req.session.user) {
+    console.log(req.session.user)
+    res.json({ loggedIn: true });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+// 사용자 입실 퇴실 정보 조회
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

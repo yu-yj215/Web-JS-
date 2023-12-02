@@ -5,6 +5,8 @@ import axios from 'axios';
 const LoginForm = (props) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  axios.defaults.withCredentials = true;
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
