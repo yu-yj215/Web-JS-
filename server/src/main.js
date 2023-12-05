@@ -43,7 +43,7 @@ app.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 사용자 추가
-    db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (error, results) => {
+    db.query('INSERT INTO users (username, password, remaining_minutes) VALUES (?, ?, ?)', [username, hashedPassword, null], (error, results) => {
       if (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -90,6 +90,19 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.post('/logout', (req, res) => {
+  // 세션 삭제
+  console.log(req.session);
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      res.status(200).json({message: 'Logged out successfully'});
+    }
+  });
+});
+
 app.get('/check-login', (req, res) => {
   if (req.session.user) {
     console.log(req.session.user)
@@ -101,6 +114,41 @@ app.get('/check-login', (req, res) => {
 
 // 사용자 입실 퇴실 정보 조회
 
+app.post('/check-in', (req, res) => {
+  let { remaintime, seat_Number } = req.body;
+  if (req.session.user) {
+    console.log(seat_Number+ "번 자리" + "입실:" + req.session.user.userid);
+    db.query('UPDATE seats SET username = ?, remaining_minutes = ? WHERE seatnumber = ?', [req.session.user.userid,remaintime, seat_Number],async () => {console.log("쿼리 성공");});
+    res.status(200).json({message:'입실 성공'});
+  } else {
+    res.status(401);
+  }
+});
+
+app.post('/check-out', async (req, res) => {
+  try {
+    const {remaintime, seat_Number } = req.body;
+    const username = req.session.user.userid;
+    console.log(seat_Number+ "번 자리" + "퇴실:" + req.session.user.userid);
+    db.query('SELECT* FROM seats WHERE username = ?',[username], async (error, results) => {
+      console.log(results);
+      if(seat_Number === results[0].seatnumber) {
+        db.query('UPDATE seats SET username = ?, remaining_minutes = ? WHERE seatnumber = ?',[null,null,seat_Number])
+        res.status(200).json({message:'퇴실 성공'}); 
+      }
+      else {
+        console.error(error);
+        console.log("사용자와 좌석소유자 불일치");
+        res.status(500).json({ error: '본인의 좌석이 아닙니다.' });
+      }
+
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

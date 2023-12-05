@@ -4,13 +4,10 @@ import LoginForm from './LoginForm';
 import RegistrationForm from './RegisterForm';
 import SeatClient from './SeatClient';
 import axios from 'axios';
-
 import './App.css';
 
 const App = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
-  const [showLoginForm, setShowLoginForm] = useState(false);
-  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [currentForm, setCurrentForm] = useState("login");
   axios.defaults.withCredentials = true;
 
@@ -35,21 +32,26 @@ const App = () => {
   // 로그인 성공 시 호출되는 함수
   const handleLoginSuccess = () => {
     setLoggedIn(true);
-    setShowLoginForm(false);
   };
 
   // 로그아웃 시 호출되는 함수
-  const handleLogout = () => {
-    setLoggedIn(false);
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:3001/logout');
+      alert(response.data.message); // 로그아웃 성공 시 서버에서 반환한 데이터
+      console.log(response.data.message);
+      setLoggedIn(false);
+    } catch (error) {
+      console.error('Logout failed:', error); // 로그아웃 실패 시 서버에서 반환한 에러 메시지
+    }
   };
 
   // 회원가입 성공 시 호출되는 함수
-  const handleRegistrationSuccess = () => {
-    setShowRegistrationForm(false);
-  };
+  
   const toggleForm = (formName) => {
     setCurrentForm(formName);
-  }
+  };
 
   return (
     <div className='App'>
@@ -60,7 +62,7 @@ const App = () => {
           currentForm === "login" ? (
             <LoginForm onFormSwitch={toggleForm} onLoginSuccess={handleLoginSuccess} />
           ) : (
-            <RegistrationForm onFormSwitch={toggleForm} onRegistrationSuccess={handleRegistrationSuccess} />
+            <RegistrationForm onFormSwitch={toggleForm} />
           )
         )
       }
