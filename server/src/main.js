@@ -43,7 +43,7 @@ app.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 사용자 추가
-    db.query('INSERT INTO users (username, password, remaining_minutes) VALUES (?, ?, ?)', [username, hashedPassword, null], (error, results) => {
+    db.query('INSERT INTO users (username, password, remaining_minutes) VALUES (?, ?, ?)', [username, hashedPassword, null], (error) => {
       if (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -90,7 +90,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/logout', (req, res) => {
+app.get('/logout', async (req, res) => {
   // 세션 삭제
   console.log(req.session);
   req.session.destroy((err) => {
@@ -103,7 +103,7 @@ app.post('/logout', (req, res) => {
   });
 });
 
-app.get('/check-login', (req, res) => {
+app.get('/check-login', async (req, res) => {
   if (req.session.user) {
     console.log(req.session.user)
     res.json({ loggedIn: true });
@@ -114,11 +114,11 @@ app.get('/check-login', (req, res) => {
 
 // 사용자 입실 퇴실 정보 조회
 
-app.post('/check-in', (req, res) => {
+app.post('/check-in', async (req, res) => {
   let { remaintime, seat_Number } = req.body;
   if (req.session.user) {
     console.log(seat_Number+ "번 자리" + "입실:" + req.session.user.userid);
-    db.query('UPDATE seats SET username = ?, remaining_minutes = ? WHERE seatnumber = ?', [req.session.user.userid,remaintime, seat_Number],async () => {console.log("쿼리 성공");});
+    db.query('UPDATE seats SET username = ?, remaining_minutes = ? WHERE seatnumber = ?', [req.session.user.userid,remaintime, seat_Number], async () => {console.log("쿼리 성공");});
     res.status(200).json({message:'입실 성공'});
   } else {
     res.status(401);
@@ -147,6 +147,28 @@ app.post('/check-out', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/seat-load', async (req, res) => {
+  // 좌석 불러오기
+  try {
+    db.query('SELECT seatnumber FROM seats WHERE username is NOT NULL', async (error, results) =>  {
+      if(error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else if (results.length === 0) {
+        res.status(401).json({ error: 'Invalid credentials' });
+      } else {
+        console.log(results)
+        res.status(200).json({list :results});
+      }
+    })
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+
   }
 });
 

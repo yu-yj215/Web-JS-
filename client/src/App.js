@@ -11,13 +11,14 @@ const App = () => {
   const [currentForm, setCurrentForm] = useState("login");
   axios.defaults.withCredentials = true;
 
+
   useEffect(() => {
     // 컴포넌트가 마운트될 때 서버에 로그인 상태 확인 요청
     axios.get('http://localhost:3001/check-login')
       .then(response => {
         if (response.data.loggedIn) {
           setLoggedIn(true);
-          console.log("유지 성공")
+          console.log("유지 성공");
         }
         else {
           setLoggedIn(false);
@@ -38,7 +39,7 @@ const App = () => {
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3001/logout');
+      const response = await axios.get('http://localhost:3001/logout');
       alert(response.data.message); // 로그아웃 성공 시 서버에서 반환한 데이터
       console.log(response.data.message);
       setLoggedIn(false);
@@ -57,10 +58,10 @@ const App = () => {
     <div className='App'>
       {
         isLoggedIn ? (
-          <SeatClient onLogout={handleLogout} />
+          <SeatClient onLogout={handleLogout}/>
         ) : (
           currentForm === "login" ? (
-            <LoginForm onFormSwitch={toggleForm} onLoginSuccess={handleLoginSuccess} />
+            <LoginForm onFormSwitch={toggleForm} onLoginSuccess={handleLoginSuccess}  />
           ) : (
             <RegistrationForm onFormSwitch={toggleForm} />
           )
