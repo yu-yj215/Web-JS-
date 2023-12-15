@@ -10,16 +10,16 @@ const RegistrationForm = (props) => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      // Check if passwords match
+      // 비밀번호 체크
       if (password !== confirmPassword) {
         alert("Passwords do not match");
         return;
       }
 
       const response = await axios.post('http://localhost:3001/register', { username, password });
-      alert(response.data.message); // Registration success message from the server
+      alert(response.data.message); // 회원가입 성공
     } catch (error) {
-      console.error('Registration failed:', error.response.data.error); // Registration failure message from the server
+      console.error('Registration failed:', error.response.data.error); // 회원가입 실패
     }
   };
 

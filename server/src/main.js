@@ -13,7 +13,7 @@ const db = mysql.createConnection({
   host: 'localhost',
   user: 'root', // MySQL 계정 사용자명
   password: 'yyj215', // MySQL 계정 비밀번호
-  database: 'studycaffe' // 위에서 생성한 데이터베이스명
+  database: 'studycaffe' // 사용할 데이터베이스명
 });
 
 app.use(
@@ -125,6 +125,7 @@ app.post('/check-in', async (req, res) => {
   }
 });
 
+// 퇴실
 app.post('/check-out', async (req, res) => {
   try {
     const {remaintime, seat_Number } = req.body;

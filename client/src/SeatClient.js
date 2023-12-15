@@ -59,6 +59,7 @@ const SeatClient = ({onLogout}) => {
     }
   };
 
+  // 퇴실 요청
   const check_out = async (e) => {
     e.preventDefault();
     try {
@@ -92,7 +93,6 @@ const SeatClient = ({onLogout}) => {
       {showModal && (
       <Modal show={showModal} handleClose={handleCloseModal} check_in={check_in} check_out={check_out}>
         <h2>입실 퇴실 선택</h2>
-        {/* 여기에 입실 퇴실 선택에 대한 내용을 추가하세요 */}
       </Modal>
       )}
 
